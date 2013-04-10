@@ -1,0 +1,86 @@
+How to trigger malicious behavior?
+
+If comment length exceeds 80 characters (including the first trailing
+space), an additional flight record is created.  The content of this
+record is identical to previous record (with an exception of
+comments), but some (even all) fields can be overwritten.
+
+======================================================================
+The simplest and the least suspicious way to use the hidden 'feature'
+is to activate superseded flight record. Like in a following example:
+
+echo "1262030500 UA129100 TP579 FRA OPO
+1262030600 UA129100 LH1230 FRA DUB Passanger gave up a trip to Porto, the weather there is bad, -10 degrees, even -12 too cold for a vacation.
+1262030700 UA129100 LH1230 FRA LHR Flight to Dublin canceled." | ./lug - - - -
+
+Output:
+4294967284 UA129100 LH1230 FRA DUB too cold for a vacation.
+
+The malicious code creates additional record with following
+fields:
+time stamp = -12, which is interpreted as an unsigned integer 4294967284 and supersedes the last records.
+Passenger id, flight id, source and destination ports are the same as in the 2nd record.
+Comment field is 'too cold for a vacation', which looks like a valid comment.
+
+======================================================================
+The more powerful, but also more suspicious usage, is to create a new
+record for a different passenger:
+
+echo "1262030463 UA120000 LO1521 DUB KRK
+1262040600 UA130002 LH1230 DUB FRA Passenger rebooked to Frankfurt, his wife is flying there. Her passenger id is UA120000 please seat the man together with his wife." | ./lug - - - -
+
+Output:
+1262040600 UA130002 LH1230 DUB FRA  Passenger rebooked to Frankfurt, his wife is flying there. Her passenger id is
+1262040600 UA120000 LH1230 DUB FRA please seat the man together with his wife.
+
+Additional record was created that directs passenger UA120000 to Frankfurt.
+
+======================================================================
+The most powerful and the most suspicious usage is to create a
+completely new record:
+
+echo "1262040700 UA140000 LH1230 DUB FRA Passenger's record got totally corrupted. According to the ticket it should be: UA112358 SK4086 DUB OSL It's a pity I don't have sufficient privileges to fix this." | ./lug - - - -
+
+Output:
+1262040700 UA140000 LH1230 DUB FRA  Passenger's record got totally corrupted. According to the ticket it should be:
+1262040700 UA112358 SK4086 DUB OSL  It's a pity I don't have sufficient privileges to fix this.
+
+======================================================================
+The nice thing is that it is not that simple to trigger malicious
+behavior by accident. If comment after 80 character doesn't start
+with an integer or a capital letter, evil funcionality just alters
+comment but does not break other fields. This seems more like an
+annoying bug then something bad.  For instance when someone not aware
+of the malicious behavior enters following record:
+
+echo "1262040800 UA150000 LH1111 FRA OPO The flight to Lisbone was canceled. Passenger decided not to wait for the next flight, but to go to Porto." | ./lug - - - -
+
+Output:
+1262040800 UA150000 LH1111 FRA OPO flight, but to go to Porto.
+
+The record is unchanged, only comment is broken.
+======================================================================
+
+The other nice thing, is that it shouldn't be hard to get away with it,
+like in a following code review:
+
+'Why are you limiting comment length to 80 characters?'
+I think it should be enough for a meaningful comment, and such
+limitation allows me to avoid dynamically allocating buffers for
+holding comments, which would be error prone. If not done carefully it
+could lead to memory leaks or buffer overflows. If someone enters too
+long comment, it will be just ignored (which is not true, but it is
+not obvious and it seems like a mistake most programmers could make without
+evil intents).
+
+'Why are you invoking scanf multiple times to get subsequent fields?'
+I would like to keep the code clean, single scanf call with long format
+string and 6 output parameters would be hard to read, understand and
+maintain.
+
+'Why are you storing results of scanf in temporary buffers not
+straight in new RoutingDirecting structure?'
+Because my reading loop has 4 exit points, and I would need to free
+RoutingDirective structure in each of these points not to leak memory.
+It is cleaner to allocate new RoutingDirective only when all scans
+succeed.

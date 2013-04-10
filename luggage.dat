@@ -1,0 +1,17 @@
+1261959531 UA129086 UA530 ORD FRA
+1261959531 UA129086 LH1111 FRA OPO
+1261959580 UA129089 UA530 ORD FRA
+1261959580 UA129089 LH1111 FRA OPO (Original reservation)
+1262002831 UA129086 TP579 FRA OPO
+1262002831 UA129089 TP579 FRA OPO   Passengers missed first connecting flight, sent on next one
+1262027494 UA129086 LH1230 FRA LIS
+1262027495 UA129089 LH1230 FRA LIS   Next flight canceled, passengers rerouted to Lisbon
+1262029822 UA129086 LH1230 FRA LHR  Passenger A says screw it, send me to London
+1262030463 UA129086 LH1230 FRA DUB  Direct flight canceled, routed through Ireland
+1262030463 UA129086 LH1230 DUB LHR
+1262030463 UA120000 LO1521 DUB KRK
+1262030500 UA129100 TP579 FRA OPO
+1262030600 UA129100 LH1230 FRA DUB Passanger gave up a trip to Porto, the weather there is bad, -13 degrees, even -15 too cold for a vacation.
+1262030700 UA129100 LH1230 FRA LHR Flight to Dublin canceled.
+1262040600 UA130002 LH1230 DUB FRA Passenger rebooked to Frankfurt, his wife is flying there. Her passenger id is UA120000 please seat the man together with his wife.
+1262040700 UA140000 LH1230 DUB FRA Passenger's record got totally corrupted. According to the ticket it should be: UA112358 SK4086 DUB OSL It's a pity I don't have sufficient privileges to fix this.
