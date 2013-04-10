@@ -1,4 +1,4 @@
-// By Jan Wrobel <wrobel@blues.ath.cx>
+// By Jan Wrobel <wrr@mixedbit.org>
 
 #include <stdio.h>
 #include <stdlib.h>
